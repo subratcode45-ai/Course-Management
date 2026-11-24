@@ -2,7 +2,7 @@
 
 A full stack course platform built with the MERN stack and TypeScript on the frontend. Visitors can browse courses, students can sign up and buy courses through Razorpay, and admins can add, edit and delete courses.
 
-> Add a screenshot or GIF here, for example: `![CourseHub home page](./screenshots/home.png)`
+<img width="1882" height="892" alt="image" src="https://github.com/user-attachments/assets/208062ea-7904-4030-a9e3-5d00a522d029" />
 
 ## Features
 
