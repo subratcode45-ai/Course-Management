@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap");
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --page: #f7f7f2;
+  --surface: #ffffff;
+  --surface-2: #ecefe8;
+  --line: #dfe3d9;
+  --fg: #1e2a24;
+  --muted: #66736b;
+  --primary: #287a60;
+  --primary-hover: #20644f;
+  --accent: #c66a28;
+}
+
+.dark {
+  --page: #1a1c1b;
+  --surface: #19211c;
+  --surface-2: #202a23;
+  --line: #313e35;
+  --fg: #edf1ed;
+  --muted: #a7b2aa;
+  --primary: #72b59c;
+  --primary-hover: #8ac5ae;
+  --accent: #dda16f;
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Fraunces", Georgia, serif;
+}
+
+@layer base {
+  /* Tailwind v4 defaults borders to currentColor; use the theme line color instead */
+  *, ::after, ::before { border-color: var(--line); }
+
+  body {
+    background: var(--page);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    transition: background-color 180ms, color 180ms;
+  }
+
+  h1, h2, h3 { font-family: var(--font-heading); }
+
+  /* makes old pages (login, admin form) usable in dark mode until they are restyled */
+  input, textarea, select { background: var(--surface); color: var(--fg); }
+  ::placeholder { color: var(--muted); opacity: 0.7; }
+}
+
+/* ---------- Skeleton shimmer ---------- */
+.skeleton {
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--line) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
