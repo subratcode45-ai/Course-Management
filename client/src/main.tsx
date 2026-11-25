@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 import AdminRoute from './Components/AdminRoute';
 import './index.css';
+import NotFound from './Components/NotFound';
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path : "*",
+    element : <NotFound />
+  }
 ]);
 
 createRoot(document.getElementById('root')!).render(

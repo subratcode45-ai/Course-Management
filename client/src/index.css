@@ -42,8 +42,13 @@
 }
 
 @layer base {
+
   /* Tailwind v4 defaults borders to currentColor; use the theme line color instead */
-  *, ::after, ::before { border-color: var(--line); }
+  *,
+  ::after,
+  ::before {
+    border-color: var(--line);
+  }
 
   body {
     background: var(--page);
@@ -52,11 +57,24 @@
     transition: background-color 180ms, color 180ms;
   }
 
-  h1, h2, h3 { font-family: var(--font-heading); }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+  }
 
   /* makes old pages (login, admin form) usable in dark mode until they are restyled */
-  input, textarea, select { background: var(--surface); color: var(--fg); }
-  ::placeholder { color: var(--muted); opacity: 0.7; }
+  input,
+  textarea,
+  select {
+    background: var(--surface);
+    color: var(--fg);
+  }
+
+  ::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+  }
 }
 
 /* ---------- Skeleton shimmer ---------- */
@@ -66,7 +84,13 @@
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
+
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
