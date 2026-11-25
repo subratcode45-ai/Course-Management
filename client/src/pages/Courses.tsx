@@ -44,17 +44,23 @@ export default function Courses() {
   const [price, setPrice] = useState('All');
   const [sort, setSort] = useState<Sort>('newest');
 
-  const load = useCallback(() => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError('');
-    api
-      .get<Course[]>('/courses')
-      .then((res) => setCourses(res.data))
-      .catch(() => setError('Could not load courses. Please try again.'))
-      .finally(() => setLoading(false));
+
+    try {
+      const res = await api.get<Course[]>('/courses');
+      setCourses(res.data);
+    } catch {
+      setError('Could not load courses. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(load, [load]);
+  useEffect(() => {
+     load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

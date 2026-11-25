@@ -3,6 +3,7 @@ import { protect, adminOnly } from '../Middlewares/auth.js';
 import {
   getCourses, getCourseById, createCourse, updateCourse, deleteCourse,
 } from '../Controllers/course.controller.js';
+import upload from '../Middlewares/upload.js';
 
 const router = Router();
 

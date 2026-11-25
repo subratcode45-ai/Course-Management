@@ -11,11 +11,18 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .get<Course[]>('/courses')
-      .then((res) => setCourses(res.data.slice(0, 3)))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const loadCourses = async () => {
+      try {
+        const res = await api.get<Course[]>('/courses');
+        setCourses(res.data.slice(0, 3));
+      } catch(err) {
+        console.error(err)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadCourses();
   }, []);
 
   return (

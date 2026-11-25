@@ -16,7 +16,7 @@ import {
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import type { Course, CreateOrderResponse } from "../types";
-import { formatPrice, initials } from "../utils/format";
+import { formatPrice, imageUrl, initials } from "../utils/format";
 import {
   CheckoutCancelled,
   loadRazorpayScript,
@@ -53,12 +53,19 @@ export default function CourseDetail() {
   const [open, setOpen] = useState<Set<number>>(new Set([0]));
 
   useEffect(() => {
-    setLoading(true);
-    api
-      .get<Course>(`/courses/${id}`)
-      .then((res) => setCourse(res.data))
-      .catch(() => setCourse(null))
-      .finally(() => setLoading(false));
+    const loadCourse = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get<Course>(`/courses/${id}`);
+        setCourse(res.data);
+      } catch {
+        setCourse(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadCourse();
   }, [id]);
 
   useEffect(() => {
@@ -66,10 +73,16 @@ export default function CourseDetail() {
       setEnrolled(false);
       return;
     }
-    api
-      .get<Course[]>("/enroll/my-courses")
-      .then((res) => setEnrolled(res.data.some((c) => c._id === id)))
-      .catch(() => {});
+    const loadEnrollment = async () => {
+      try {
+        const res = await api.get<Course[]>("/enroll/my-courses");
+        setEnrolled(res.data.some((c) => c._id === id));
+      } catch {
+        console.log()
+      }
+    };
+
+    void loadEnrollment();
   }, [user, id]);
 
   const handleBuy = async () => {
@@ -353,7 +366,7 @@ export default function CourseDetail() {
         {/* RIGHT: sticky buy card (desktop) */}
         <aside className="hidden h-fit overflow-hidden rounded-lg border border-line bg-surface lg:sticky lg:top-24 lg:block">
           <img
-            src={course.thumbnail}
+            src={imageUrl(course.thumbnail)}
             alt={course.title}
             className="aspect-video w-full bg-surface-2 object-cover"
           />

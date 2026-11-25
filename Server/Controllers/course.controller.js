@@ -30,11 +30,17 @@ export const createCourse = async (req, res) => {
 
 export const updateCourse = async (req, res) => {
   try {
+    const old = await Course.findById(req.params.id);
+    if (!old) return res.status(404).json({ message: "Course not found" });
+
     const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-    if (!course) return res.status(404).json({ message: "Course not found" });
+
+    if (old.thumbnail !== course.thumbnail)
+      await removeThumbnail(old.thumbnail);
+
     res.json(course);
   } catch (err) {
     res.status(400).json({ message: err.message });

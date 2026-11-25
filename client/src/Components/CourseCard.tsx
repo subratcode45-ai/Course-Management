@@ -1,7 +1,7 @@
 import { Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { Course } from '../types';
-import { formatPrice, initials } from '../utils/format';
+import { formatPrice, imageUrl, initials } from '../utils/format';
 
 export default function CourseCard({ course }: { course: Course }) {
   const free = course.price === 0;
@@ -13,7 +13,7 @@ export default function CourseCard({ course }: { course: Course }) {
     >
       <div className="relative aspect-16/10- overflow-hidden bg-surface-2">
         <img
-          src={course.thumbnail}
+          src={imageUrl(course.thumbnail)}
           alt={course.title}
           className="h-full w-full object-cover"
         />

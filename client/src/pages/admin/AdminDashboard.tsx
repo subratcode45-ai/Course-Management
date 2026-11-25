@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import api from "../../api/axios";
 import type { Course } from "../../types";
-import { formatPrice } from "../../utils/format";
+import { formatPrice, imageUrl } from "../../utils/format";
 
 interface Toast {
   type: "success" | "error";
@@ -95,17 +95,23 @@ export default function AdminDashboard() {
   const [target, setTarget] = useState<Course | null>(null); // course pending deletion
   const [deleting, setDeleting] = useState(false);
 
-  const load = useCallback(() => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError("");
-    api
-      .get<Course[]>("/courses")
-      .then((res) => setCourses(res.data))
-      .catch(() => setError("Could not load courses. Please try again."))
-      .finally(() => setLoading(false));
+
+    try {
+      const res = await api.get<Course[]>("/courses");
+      setCourses(res.data);
+    } catch {
+      setError("Could not load courses. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => load, [load]);
+  useEffect(() => {
+    load()
+  }, [load]);
 
   // auto-dismiss toast
   useEffect(() => {
@@ -260,7 +266,7 @@ export default function AdminDashboard() {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={c.thumbnail}
+                          src={imageUrl(c.thumbnail)}
                           alt=""
                           className="h-12 w-20 shrink-0 rounded-md bg-surface-2 object-cover"
                         />
