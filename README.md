@@ -1,8 +1,9 @@
 # CourseHub
 
-A full stack course platform built with the MERN stack and TypeScript on the frontend. Visitors can browse courses, students can sign up and buy courses through Razorpay, and admins can add, edit and delete courses.
+A full stack course platform built with the MERN stack and TypeScript on the frontend. Visitors can browse courses, students can sign up and buy courses through Razorpay, and admins can add, edit and delete courses, including uploading course thumbnails.
 
-<img width="1882" height="892" alt="image" src="https://github.com/user-attachments/assets/208062ea-7904-4030-a9e3-5d00a522d029" />
+> <img width="1882" height="892" alt="Screenshot 2026-11-24 155956" src="https://github.com/user-attachments/assets/a39b93a2-3a72-4234-808c-b09910455739" />
+
 
 ## Features
 
@@ -18,7 +19,16 @@ A full stack course platform built with the MERN stack and TypeScript on the fro
 **Admins**
 - Dashboard with course stats, search and a delete confirmation modal
 - Add and edit courses with one reusable form
+- Upload course thumbnails from the form (drag and drop, live preview, upload progress)
 - Admin-only routes protected on both the frontend and the backend
+
+**File handling (Multer)**
+- Thumbnails are uploaded to the server with Multer and stored in `Server/uploads/thumbnails`
+- Only JPG, PNG and WebP images are accepted, up to 5 MB
+- Upload route is admin-only
+- Files get random names, and the file extension comes from the checked image type
+- Old images are deleted when a course is updated or deleted, and unused files are cleaned up automatically
+- Courses that already use an external image URL keep working
 
 **UI**
 - Light and dark theme with saved preference
@@ -32,12 +42,13 @@ A full stack course platform built with the MERN stack and TypeScript on the fro
 | Frontend | React, Vite, TypeScript, Tailwind CSS v4, React Router (`createBrowserRouter`), Axios, lucide-react |
 | Backend | Node.js, Express, MongoDB, Mongoose |
 | Auth | JWT, bcryptjs |
+| File uploads | Multer (local disk storage) |
 | Payments | Razorpay (test mode) |
 
 ## Project structure
 
 ```
-course-platform/
+Course-Management/
 ├── client/                 # React + Vite + TypeScript
 │   └── src/
 │       ├── api/            # axios instance
@@ -46,12 +57,13 @@ course-platform/
 │       ├── pages/          # Home, Courses, CourseDetail, Login, admin/...
 │       ├── types/
 │       └── utils/
-└── server/                 # Express API
-    ├── config/             # db and razorpay setup
-    ├── controllers/
-    ├── middleware/         # auth (protect, adminOnly)
-    ├── models/             # User, Course, Enrollment, Payment
-    ├── routes/
+└── Server/                 # Express API
+    ├── Config/             # db, razorpay and upload path setup
+    ├── Controllers/
+    ├── Middlewares/        # auth (protect, adminOnly), Multer upload
+    ├── Models/             # User, Course, Enrollment, Payment
+    ├── Routes/
+    ├── uploads/            # uploaded thumbnails (git-ignored)
     └── server.js
 ```
 
@@ -66,18 +78,18 @@ course-platform/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/subratcode45-ai/Course-Management.git
+cd Course-Management
 ```
 
 ### 2. Set up the backend
 
 ```bash
-cd server
+cd Server
 npm install
 ```
 
-Create `server/.env`:
+Create `Server/.env`:
 
 ```env
 PORT=8080
@@ -87,11 +99,13 @@ RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
 RAZORPAY_KEY_SECRET=your_razorpay_test_secret
 ```
 
-Start the server:
+Start the server (run it from inside the `Server` folder, because the upload folder path is relative to it):
 
 ```bash
 npm run dev
 ```
+
+The `uploads/thumbnails` folder is created automatically on the first run.
 
 ### 3. Set up the frontend
 
@@ -136,12 +150,22 @@ New accounts are always created with the `user` role. To make an admin:
 | POST | `/api/courses` | Admin | Create a course |
 | PUT | `/api/courses/:id` | Admin | Update a course |
 | DELETE | `/api/courses/:id` | Admin | Delete a course |
+| POST | `/api/upload/thumbnail` | Admin | Upload a thumbnail image (multipart form, field name `thumbnail`) |
+| GET | `/uploads/thumbnails/:file` | Public | Serve an uploaded thumbnail |
 | POST | `/api/enroll/:courseId` | User | Enroll in a free course (paid courses need a verified payment) |
 | GET | `/api/enroll/my-courses` | User | List purchased courses |
 | POST | `/api/payment/create-order` | User | Create a Razorpay order for a paid course |
 | POST | `/api/payment/verify` | User | Verify the payment signature and enroll the user |
 
 Protected routes expect the header `Authorization: Bearer <token>`.
+
+## How thumbnail upload works
+
+1. The admin picks or drops an image in the course form.
+2. The frontend checks the type and size, then sends it to `POST /api/upload/thumbnail` as `multipart/form-data`.
+3. Multer validates the file again on the server and saves it to `Server/uploads/thumbnails`.
+4. The server returns a path such as `/uploads/thumbnails/<name>.jpg`, which is stored in the course's `thumbnail` field.
+5. The frontend turns that path into a full URL using the API origin, so the image displays on cards and course pages.
 
 ## How payments work
 
@@ -176,20 +200,38 @@ You can add courses from the admin dashboard, or send this to `POST /api/courses
 }
 ```
 
-## Known limitations and roadmap
+## Roadmap
 
-- [ ] Razorpay webhook, so a user is enrolled even if they close the tab after paying
-- [ ] Email OTP verification on login (Nodemailer)
-- [ ] Image upload (Multer and Cloudinary) instead of thumbnail URLs
-- [ ] Rate limiting on auth routes
+Done:
+- [x] Course browsing, search, filters and sorting
+- [x] JWT authentication with user and admin roles
+- [x] Razorpay payments (test mode) with server-side verification
+- [x] Admin dashboard and course form
+- [x] Thumbnail upload with Multer
+- [x] Light and dark theme
+
+Planned, in this order:
+1. [ ] **Razorpay webhook**: enroll the user even if they close the tab after paying
+2. [ ] **Rate limiting**: limit requests on login, register and upload routes with `express-rate-limit`
+3. [ ] **Forgot password** with Nodemailer: emailed reset link with a short-lived token
+4. [ ] **Lesson content and course player**: videos and downloadable resources that only enrolled students can open
+5. [ ] **Cloudinary for uploads**: move images off local disk before deploying, since many hosts delete local files on every deploy
+
+Also worth adding:
+- [ ] Input validation on the API (for example with `zod`)
+- [ ] Security hardening: `helmet`, and CORS restricted to the live frontend URL
+- [ ] Progress tracking (mark lessons complete, show a progress bar)
+- [ ] Payment history page for students
+- [ ] Email receipts after purchase
 - [ ] Reviews and ratings
-- [ ] Lesson content (videos) and progress tracking
-- [ ] Deployment: backend on Render, frontend on Vercel, with CORS restricted to the live frontend URL
+- [ ] Server-side search and pagination for large course lists
+- [ ] Deployment: backend on Render, frontend on Vercel
 
 ## Security notes
 
-- Never commit `.env` files. Make sure `.env` and `node_modules` are in `.gitignore`.
+- Never commit `.env` files. Make sure `.env`, `node_modules` and `uploads/` are in `.gitignore`.
 - The Razorpay secret key stays on the server only.
+- Uploads accept only JPG, PNG and WebP (SVG is blocked because it can contain scripts), with a 5 MB limit and only for admins.
 - Frontend route guards are for user experience. The real access checks are the `protect` and `adminOnly` middleware on the API.
 
 ## License

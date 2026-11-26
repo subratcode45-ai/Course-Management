@@ -1,1 +1,0 @@
-I think we should do like this, webhook -> rate-limiting -> forgot password (through node mailer) ->image upload -> lesson content and course player
