@@ -1,4 +1,4 @@
-import Enrollment from "../models/Enrollment.js";
+import Enrollment from "../Models/Enrollment.js";
 import Course from "../Models/Course.js";
 
 export const enrollCourse = async (req, res) => {
