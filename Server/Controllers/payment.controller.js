@@ -1,7 +1,7 @@
 import razorpay from "../Config/razorpay.js";
 import Payment from "../Models/Payment.js";
 import Course from "../Models/Course.js";
-import Enrollment from "../models/Enrollment.js"
+import Enrollment from "../Models/Enrollment.js"
 import crypto from "crypto";
 
 export const createOrder = async (req, res) => {
